@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookTrend 화면설계서</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #534AB7;
+    --primary-light: #AFA9EC;
+    --primary-bg: #EEEDFE;
+    --success: #1D9E75;
+    --success-bg: #EAF3DE;
+    --success-dark: #27500A;
+    --danger: #D85A30;
+    --danger-bg: #FAECE7;
+    --text-1: #1a1a1a;
+    --text-2: #555;
+    --text-3: #888;
+    --border: #e0dfe8;
+    --bg-page: #f7f6fb;
+    --bg-card: #ffffff;
+    --bg-section: #f2f1f8;
+    --nav-bg: #1a1a2e;
+    --radius: 8px;
+  }
+
+  body {
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    background: var(--bg-page);
+    color: var(--text-1);
+    line-height: 1.6;
+  }
+
+  /* ── 문서 헤더 ── */
+  .doc-header {
+    background: var(--nav-bg);
+    color: #fff;
+    padding: 48px 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .doc-header::after {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: rgba(83,74,183,0.25);
+  }
+  .doc-badge {
+    display: inline-block;
+    background: rgba(175,169,236,0.25);
+    color: var(--primary-light);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+  .doc-title { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+  .doc-title span { color: var(--primary-light); }
+  .doc-sub { font-size: 14px; color: rgba(255,255,255,0.55); }
+  .doc-meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 24px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+  }
+  .doc-meta strong { color: rgba(255,255,255,0.75); }
+
+  /* ── 목차 ── */
+  .toc {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 60px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .toc a {
+    font-size: 12px;
+    color: var(--text-2);
+    text-decoration: none;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+  }
+  .toc a:hover { background: var(--primary-bg); color: var(--primary); border-color: var(--primary-light); }
+
+  /* ── 본문 레이아웃 ── */
+  .main { max-width: 1100px; margin: 0 auto; padding: 48px 40px 80px; }
+
+  /* ── 섹션 ── */
+  .section { margin-bottom: 64px; }
+  .section-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: var(--primary-bg);
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .section-desc {
+    font-size: 14px;
+    color: var(--text-2);
+    margin-bottom: 24px;
+  }
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 56px 0;
+  }
+
+  /* ── 브라우저 목업 프레임 ── */
+  .browser {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(83,74,183,0.10);
+    background: var(--bg-card);
+    margin-bottom: 20px;
+  }
+  .browser-bar {
+    background: #f0eff8;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .dots { display: flex; gap: 5px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+  .url-bar {
+    flex: 1;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: var(--text-3);
+    font-family: monospace;
+  }
+
+  /* ── 앱 UI ── */
+  .app-nav {
+    background: var(--nav-bg);
+    color: #fff;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .app-logo { font-size: 15px; font-weight: 700; }
+  .app-logo em { color: var(--primary-light); font-style: normal; }
+  .crawl-btn {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .crawl-btn.disabled { background: #888; opacity: 0.7; cursor: not-allowed; }
+
+  .app-hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #2d2b55 100%);
+    color: #fff;
+    padding: 20px 24px;
+  }
+  .hero-h { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .hero-s { font-size: 12px; color: rgba(175,169,236,0.8); }
+
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: #fff;
+    padding: 0 24px;
+  }
+  .tab {
+    padding: 11px 18px;
+    font-size: 13px;
+    color: var(--text-3);
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+
+  .app-body { padding: 20px 24px; background: var(--bg-page); }
+  .cat-label { font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 12px; }
+
+  /* ── 책 카드 ── */
+  .book-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .book-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+  }
+  .book-cover {
+    width: 40px;
+    height: 56px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .book-info { flex: 1; min-width: 0; }
+  .book-rank { font-size: 10px; color: var(--text-3); margin-bottom: 2px; }
+  .book-title { font-size: 11px; font-weight: 600; line-height: 1.45; }
+  .book-author { font-size: 10px; color: var(--text-3); margin-top: 3px; }
+  .badge-common {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    background: var(--success-bg);
+    color: var(--success-dark);
+    border-radius: 3px;
+    padding: 1px 5px;
+    margin-top: 4px;
+  }
+
+  /* ── 키워드 차트 ── */
+  .chart-wrap {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .chart-select-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .chart-select-label { font-size: 12px; color: var(--text-2); }
+  .chart-select {
+    font-size: 12px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 4px 10px;
+    background: white;
+    color: var(--text-1);
+  }
+  .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .bar-kw { font-size: 11px; color: var(--text-2); width: 44px; text-align: right; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 18px; background: var(--bg-section); border-radius: 4px; overflow: hidden; }
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+  }
+  .bar-val { font-size: 10px; color: #fff; font-weight: 700; }
+  .chart-note { font-size: 10px; color: var(--text-3); text-align: right; margin-top: 10px; }
+
+  /* ── 비교 패널 ── */
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .compare-col { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: #fff; }
+  .compare-head {
+    padding: 9px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-head.aladin { background: #e6f1fb; color: #185FA5; }
+  .compare-head.yes24  { background: var(--danger-bg); color: #993C1D; }
+  .compare-row {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .compare-row:last-child { border-bottom: none; }
+  .compare-row.common { background: var(--success-bg); }
+  .crank { font-size: 10px; color: var(--text-3); min-width: 22px; }
+  .ctitle { flex: 1; line-height: 1.4; }
+
+  /* ── 상태 토스트 ── */
+  .toast {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #fff;
+  }
+  .toast-info    { background: #2a2a45; }
+  .toast-warn    { background: #7a3a1a; }
+  .toast-success { background: #1a5a3a; }
+  .toast-error   { background: #6a1a1a; }
+
+  /* ── 상태 전이 그리드 ── */
+  .state-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .state-box {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .state-header {
+    background: var(--bg-section);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .state-step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px; height: 18px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 10px;
+    border-radius: 50%;
+    font-weight: 700;
+  }
+  .state-body { padding: 14px; }
+
+  /* ── 주석 박스 ── */
+  .anno {
+    background: #fffbf0;
+    border-left: 4px solid #EF9F27;
+    border-radius: 0 6px 6px 0;
+    padding: 10px 16px;
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.8;
+    margin-top: 14px;
+  }
+  .anno strong { color: var(--text-1); }
+
+  /* ── 명세 테이블 ── */
+  .spec-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .spec-table thead th {
+    background: var(--nav-bg);
+    color: rgba(255,255,255,0.85);
+    padding: 11px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.03em;
+  }
+  .spec-table tbody td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  .spec-table tbody tr:last-child td { border-bottom: none; }
+  .spec-table tbody tr:nth-child(even) td { background: var(--bg-section); }
+  .spec-table code { font-family: monospace; font-size: 12px; background: #f0eff8; padding: 1px 5px; border-radius: 3px; color: var(--primary); }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .badge-must   { background: #FCEBEB; color: #A32D2D; }
+  .badge-should { background: #FAEEDA; color: #854F0B; }
+  .badge-nice   { background: #E6F1FB; color: #185FA5; }
+
+  /* ── 색상 팔레트 ── */
+  .palette { display: flex; gap: 10px; flex-wrap: wrap; }
+  .swatch {
+    width: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .swatch-color { height: 48px; }
+  .swatch-label { font-size: 10px; padding: 5px 4px; background: #fff; color: var(--text-2); }
+
+  /* ── 플로우 미니맵 ── */
+  .flow-diagram {
+    background: var(--bg-section);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-size: 12px;
+  }
+  .flow-node {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 12px;
+    color: var(--text-1);
+    font-weight: 500;
+    text-align: center;
+    min-width: 80px;
+  }
+  .flow-node.primary { background: var(--primary-bg); border-color: var(--primary-light); color: var(--primary); }
+  .flow-node.success { background: var(--success-bg); border-color: #5DCAA5; color: #0F6E56; }
+  .flow-node.danger  { background: var(--danger-bg); border-color: #F0997B; color: #993C1D; }
+  .flow-arrow { color: var(--text-3); font-size: 16px; line-height: 1; }
+
+  /* ── 페이지 하단 ── */
+  .doc-footer {
+    text-align: center;
+    padding: 32px;
+    font-size: 12px;
+    color: var(--text-3);
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ────────────────────────────────────────
+     문서 헤더
+──────────────────────────────────────── -->
+<header class="doc-header">
+  <span class="doc-badge">화면설계서 · Screen Design Document</span>
+  <h1 class="doc-title">Book<span>Trend</span></h1>
+  <p class="doc-sub">도서 베스트셀러 트렌드 대시보드 — 웹 UI 명세서</p>
+  <div class="doc-meta">
+    <span><strong>버전</strong> v1.0</span>
+    <span><strong>작성일</strong> 2026-06-29</span>
+    <span><strong>플랫폼</strong> 웹 브라우저 (SPA, localhost:5000)</span>
+    <span><strong>기술스택</strong> HTML · Vanilla JS · Chart.js · Flask</span>
+  </div>
+</header>
+
+<!-- ────────────────────────────────────────
+     목차
+──────────────────────────────────────── -->
+<nav class="toc">
+  <a href="#scr01">SCR-01 전체 레이아웃</a>
+  <a href="#scr02">SCR-02 베스트셀러 순위</a>
+  <a href="#scr03">SCR-03 키워드 트렌드</a>
+  <a href="#scr04">SCR-04 서점별 비교</a>
+  <a href="#scr05">SCR-05 크롤링 상태</a>
+  <a href="#spec">컴포넌트 명세</a>
+  <a href="#design">디자인 가이드</a>
+</nav>
+
+<main class="main">
+
+  <!-- ====================================================
+       SCR-01 · 전체 레이아웃
+  ==================================================== -->
+  <section class="section" id="scr01">
+    <span class="section-num">SCR-01</span>
+    <h2 class="section-title">전체 레이아웃 구조</h2>
+    <p class="section-desc">단일 페이지(SPA) 구성. 상단 고정 네비게이션 → 히어로 영역 → 탭 전환 → 컨텐츠 섹션 순으로 배치된다.</p>
+
+    <div class="browser">
+      <div class="browser-bar">
+        <div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+        <span class="url-bar">http://localhost:5000</span>
+      </div>
+
+      <!-- 네비게이션 -->
+      <div class="app-nav">
+        <span class="app-logo">📚 Book<em>Trend</em></span>
+        <button class="crawl-btn">🔄 지금 크롤링</button>
+      </div>
+
+      <!-- 히어로 -->
+      <div class="app-hero">
+        <p class="hero-h">도서 베스트셀러 트렌드 대시보드</p>
+        <p class="hero-s">알라딘 · Yes24 주간 베스트셀러를 한눈에 비교 분석합니다</p>
+      </div>
+
+      <!-- 탭 -->
+      <div class="tabs">
+        <span class="tab active">📊 베스트셀러 순위</span>
+        <span class="tab">🔑 키워드 트렌드</span>
+        <span class="tab">⚖️ 서점별 순위 비교</span>
+      </div>
+
+      <!-- 콘텐츠 예시 -->
+      <div class="app-body">
+        <p class="cat-label">분야: 경제/경영 | 서점: 알라딘</p>
+        <div class="book-grid">
+          <div class="book-card">
+            <div class="book-cover" style="background:#534AB7">표지</div>
+            <div class="book-info">
+              <p class="book-rank">1위</p>
+              <p class="book-title">부의 갈림길</p>
+              <p class="book-author">김도윤 지음</p>
+              <span class="badge-common">공통</span>
+            </div>
+          </div>
+          <div class="book-card">
+            <div class="book-cover" style="background:#1D9E75">표지</div>
+            <div class="book-info">
+              <p class="book-rank">2위</p>
+              <p class="book-title">나의 첫 번째 부동산 교과서</p>
+              <p class="book-author">정태익 지음</p>
+            </div>
+          </div>
+          <div class="book-card">
+            <div class="book-cover" style="background:#D85A30">표지</div>
+            <div class="book-info">
+              <p class="book-rank">3위</p>
+              <p class="book-title">박곰희 연금 부자 수업</p>
+              <p class="book-author">박곰희 지음</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="anno">
+      <strong>네비게이션 바(UI-01)</strong>: position sticky, z-index 상단 고정. 좌측 로고 + 우측 크롤링 버튼.<br>
+      <strong>히어로 영역(UI-02)</strong>: 서비스명·부제 표시. 크롤링 완료 시 마지막 수집 시각 노출 권장.<br>
+      <strong>탭(UI-03)</strong>: 3개 섹션 전환. 활성 탭은 보라 언더라인(#534AB7) 표시.<br>
+      <strong>공통 도서(UI-09)</strong>: 두 서점 동시 등장 시 초록 "공통" 배지 카드 내부 표시.
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ====================================================
+       SCR-02 · 베스트셀러 순위
+  ==================================================== -->
+  <section class="section" id="scr02">
+    <span class="section-num">SCR-02</span>
+    <h2 class="section-title">베스트셀러 순위 섹션</h2>
+    <p class="section-desc">분야(9개) × 서점(알라딘/Yes24) 탭을 조합해 해당 순위 카드 3개를 표시한다. API: <code>GET /api/books</code></p>
+
+    <div class="browser">
+      <div class="browser-bar">
+        <div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+        <span class="url-bar">http://localhost:5000 → 📊 베스트셀러 순위 탭</span>
+      </div>
+      <div class="tabs" style="border-top: 1px solid var(--border);">
+        <span class="tab active">알라딘</span>
+        <span class="tab">Yes24</span>
+      </div>
+      <div class="app-body">
+        <p class="cat-label" style="margin-bottom:14px;">🏷 분야 선택: 경제/경영 · 자기계발 · 소설 · 인문 · 사회과학 · 과학 · 컴퓨터/IT · 건강/취미 · 어린이</p>
+        <p class="cat-label">현재 선택: 경제/경영 | 알라딘</p>
+        <div class="book-grid">
+          <div class="book-card">
+            <div class="book-cover" style="background:#534AB7">표지</div>
+            <div class="book-info">
+              <p class="book-rank">🥇 1위</p>
+              <p class="book-title">부의 갈림길</p>
+              <p class="book-author">김도윤 지음 · 다산북스</p>
+              <span class="badge-common">공통</span>
+            </div>
+          </div>
+          <div class="book-card">
+            <div class="book-cover" style="background:#1D9E75">표지</div>
+            <div class="book-info">
+              <p class="book-rank">🥈 2위</p>
+              <p class="book-title">나의 첫 번째 부동산 교과서</p>
+              <p class="book-author">정태익 지음 · 위즈덤하우스</p>
+            </div>
+          </div>
+          <div class="book-card">
+            <div class="book-cover" style="background:#D85A30">표지</div>
+            <div class="book-info">
+              <p class="book-rank">🥉 3위</p>
+              <p class="book-title">박곰희 연금 부자 수업</p>
+              <p class="book-author">박곰희 지음 · 한빛미디어</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="anno">
+      <strong>분야 필터</strong>: 버튼 또는 드롭다운 → 선택 즉시 카드 갱신 (클라이언트 필터링, 추가 API 호출 없음).<br>
+      <strong>서점 탭</strong>: 알라딘 / Yes24 전환 시 동일 분야 다른 서점 데이터 표시.<br>
+      <strong>표지 이미지</strong>: <code>cover_url</code> 값으로 <code>&lt;img&gt;</code> 렌더링. 이미지 로드 실패 시 회색 플레이스홀더 표시.<br>
+      <strong>알라딘 건강/취미·어린이</strong>: wbest.aspx 크롤링 특성상 저자·출판사 빈 문자열일 수 있음. "-" 또는 공란으로 표시.
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ====================================================
+       SCR-03 · 키워드 트렌드
+  ==================================================== -->
+  <section class="section" id="scr03">
+    <span class="section-num">SCR-03</span>
+    <h2 class="section-title">키워드 트렌드 섹션</h2>
+    <p class="section-desc">분야별로 도서 제목에서 추출한 대표 키워드(책당 1개) 빈도 Top 10을 Chart.js 가로 막대 차트로 표시한다. API: <code>GET /api/trends</code></p>
+
+    <div class="browser">
+      <div class="browser-bar">
+        <div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+        <span class="url-bar">http://localhost:5000 → 🔑 키워드 트렌드 탭</span>
+      </div>
+      <div class="app-body">
+        <div class="chart-wrap">
+          <div class="chart-select-row">
+            <span class="chart-select-label">분야 선택</span>
+            <select class="chart-select">
+              <option>경제/경영</option>
+              <option>자기계발</option>
+              <option>소설</option>
+              <option>인문</option>
+              <option>사회과학</option>
+              <option>과학</option>
+              <option>컴퓨터/IT</option>
+              <option>건강/취미</option>
+              <option>어린이</option>
+            </select>
+            <span style="font-size:12px;color:var(--text-3);margin-left:auto">책 한 권 = 키워드 1개 기준</span>
+          </div>
+
+          <div class="bar-row">
+            <span class="bar-kw">부동산</span>
+            <div class="bar-track"><div class="bar-fill" style="width:100%;background:#534AB7"><span class="bar-val">2</span></div></div>
+          </div>
+          <div class="bar-row">
+            <span class="bar-kw">연금</span>
+            <div class="bar-track"><div class="bar-fill" style="width:100%;background:#534AB7"><span class="bar-val">2</span></div></div>
+          </div>
+          <div class="bar-row">
+            <span class="bar-kw">투자</span>
+            <div class="bar-track"><div class="bar-fill" style="width:50%;background:#7F77DD"><span class="bar-val">1</span></div></div>
+          </div>
+          <div class="bar-row">
+            <span class="bar-kw">부자</span>
+            <div class="bar-track"><div class="bar-fill" style="width:50%;background:#7F77DD"><span class="bar-val">1</span></div></div>
+          </div>
+          <div class="bar-row">
+            <span class="bar-kw">경제</span>
+            <div class="bar-track"><div class="bar-fill" style="width:50%;background:#7F77DD"><span class="bar-val">1</span></div></div>
+          </div>
+          <p class="chart-note">Chart.js 수평 막대 차트 · 분야별 키워드 빈도 Top 10 · kiwipiepy NLP 분석 결과</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="anno">
+      <strong>드롭다운 변경</strong>: <code>GET /api/trends?category={선택분야}</code> 재요청 → Chart.js 데이터 update (destroy → re-render).<br>
+      <strong>키워드 추출 기준</strong>: kiwipiepy 형태소 분석 → 명사(NN*) → 불용어 제거 → 책당 첫 번째 유효 명사 1개.<br>
+      <strong>빈도 해석</strong>: 해당 키워드가 몇 권의 책 제목에 등장했는지를 나타냄 (단어 출현 횟수가 아님).<br>
+      <strong>데이터 없을 때</strong>: "크롤링 후 분석 데이터가 생성됩니다" 안내 문구 표시.
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ====================================================
+       SCR-04 · 서점별 순위 비교
+  ==================================================== -->
+  <section class="section" id="scr04">
+    <span class="section-num">SCR-04</span>
+    <h2 class="section-title">서점별 순위 비교 섹션</h2>
+    <p class="section-desc">분야별로 알라딘 · Yes24 순위를 좌우에 나란히 배치한다. 두 서점 공통 도서는 초록 배경 + "공통" 배지로 강조한다. API: <code>GET /api/compare</code></p>
+
+    <div class="browser">
+      <div class="browser-bar">
+        <div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+        <span class="url-bar">http://localhost:5000 → ⚖️ 서점별 순위 비교 탭</span>
+      </div>
+      <div class="app-body">
+
+        <p class="cat-label" style="margin-bottom:12px">경제/경영</p>
+        <div class="compare-grid" style="margin-bottom:20px">
+          <div class="compare-col">
+            <div class="compare-head aladin">📗 알라딘</div>
+            <div class="compare-row common">
+              <span class="crank">1위</span>
+              <span class="ctitle">부의 갈림길</span>
+              <span class="badge-common">공통</span>
+            </div>
+            <div class="compare-row">
+              <span class="crank">2위</span>
+              <span class="ctitle">나의 첫 번째 부동산 교과서</span>
+            </div>
+            <div class="compare-row">
+              <span class="crank">3위</span>
+              <span class="ctitle">박곰희 연금 부자 수업</span>
+            </div>
+          </div>
+          <div class="compare-col">
+            <div class="compare-head yes24">🔴 Yes24</div>
+            <div class="compare-row common">
+              <span class="crank">1위</span>
+              <span class="ctitle">부의 갈림길</span>
+              <span class="badge-common">공통</span>
+            </div>
+            <div class="compare-row">
+              <span class="crank">2위</span>
+              <span class="ctitle">나의 첫 번째 부동산 교과서</span>
+            </div>
+            <div class="compare-row">
+              <span class="crank">3위</span>
+              <span class="ctitle">이병한의 대한민국 탐문</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="cat-label" style="margin-bottom:12px">어린이</p>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <div class="compare-head aladin">📗 알라딘</div>
+            <div class="compare-row common">
+              <span class="crank">1위</span>
+              <span class="ctitle">포켓몬 생태도감 특별판</span>
+              <span class="badge-common">공통</span>
+            </div>
+            <div class="compare-row">
+              <span class="crank">2위</span>
+              <span class="ctitle">포켓몬 생태도감</span>
+            </div>
+            <div class="compare-row">
+              <span class="crank">3위</span>
+              <span class="ctitle">멜로우TV 팀나빠 1</span>
+            </div>
+          </div>
+          <div class="compare-col">
+            <div class="compare-head yes24">🔴 Yes24</div>
+            <div class="compare-row common">
+              <span class="crank">1위</span>
+              <span class="ctitle">포켓몬 생태도감 특별판</span>
+              <span class="badge-common">공통</span>
+            </div>
+            <div class="compare-row">
+              <span class="crank">2위</span>
+              <span class="ctitle">만화로 보는 5분 한국사</span>
+            </div>
+            <div class="compare-row">
+              <span class="crank">3위</span>
+              <span class="ctitle">멜로우TV 수학 퍼즐 매직 팡 1</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="anno">
+      <strong>공통 감지 로직</strong>: 제목 문자열 정규화 후 일치 여부 확인 → <code>common: true</code> 플래그 → 초록(#EAF3DE) 배경 + "공통" 배지.<br>
+      <strong>분야 표시 순서</strong>: 경제/경영 · 자기계발 · 소설 · 인문 · 사회과학 · 과학 · 컴퓨터/IT · 건강/취미 · 어린이 (9개 분야 스크롤).<br>
+      <strong>서점 헤더 색상</strong>: 알라딘 = 파랑 계열, Yes24 = 주황 계열로 시각 구분.
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ====================================================
+       SCR-05 · 크롤링 상태 전이
+  ==================================================== -->
+  <section class="section" id="scr05">
+    <span class="section-num">SCR-05</span>
+    <h2 class="section-title">크롤링 버튼 상태 전이</h2>
+    <p class="section-desc">크롤링 버튼은 4가지 상태를 가진다. 비동기 백그라운드 실행 + 2초 폴링으로 UI를 업데이트한다.</p>
+
+    <div class="state-grid">
+
+      <div class="state-box">
+        <div class="state-header">
+          <span class="state-step">1</span> 대기 상태 (기본값)
+        </div>
+        <div class="state-body">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+            <button class="crawl-btn">🔄 지금 크롤링</button>
+          </div>
+          <p style="font-size:12px;color:var(--text-2)">클릭 가능. <code>POST /api/crawl</code> 요청 전송.</p>
+        </div>
+      </div>
+
+      <div class="state-box">
+        <div class="state-header">
+          <span class="state-step">2</span> 실행 중 (비활성화)
+        </div>
+        <div class="state-body">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+            <button class="crawl-btn disabled">⏳ 알라딘 수집 중...</button>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+            <span class="toast toast-info">크롤링 시작 — 완료 후 자동 갱신</span>
+          </div>
+          <p style="font-size:12px;color:var(--text-2)"><code>GET /api/crawl/status</code> 2초마다 폴링 → 진행 메시지를 버튼 텍스트에 반영.</p>
+        </div>
+      </div>
+
+      <div class="state-box">
+        <div class="state-header">
+          <span class="state-step">3</span> 중복 요청 차단
+        </div>
+        <div class="state-body">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+            <button class="crawl-btn disabled">⏳ Yes24 수집 중...</button>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+            <span class="toast toast-warn">⚠️ 이미 크롤링 중입니다</span>
+          </div>
+          <p style="font-size:12px;color:var(--text-2)">실행 중 재요청 시 서버가 <code>"status":"running"</code> 반환 → 토스트만 표시.</p>
+        </div>
+      </div>
+
+      <div class="state-box">
+        <div class="state-header">
+          <span class="state-step">4</span> 완료 & 자동 갱신
+        </div>
+        <div class="state-body">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+            <button class="crawl-btn">🔄 지금 크롤링</button>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+            <span class="toast toast-success">✅ 크롤링 완료 — 대시보드 갱신됨</span>
+          </div>
+          <p style="font-size:12px;color:var(--text-2)">status='완료' 수신 → 버튼 복구 → 완료 토스트 → 전 섹션 데이터 reload.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="anno">
+      <strong>폴링 흐름</strong>: POST /api/crawl → (200 started) → setTimeout 루프: GET /api/crawl/status 2초마다 → running=false &amp;&amp; message='완료' → 갱신.<br>
+      <strong>오류 상태</strong>: message가 '오류:'로 시작하면 빨간 토스트 + 버튼 복구. 재시도 안내 표시 권장.<br>
+      <strong>토스트 소멸</strong>: 완료·오류 토스트는 3초 후 자동 사라짐 (setTimeout + CSS opacity transition).
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ====================================================
+       컴포넌트 명세표
+  ==================================================== -->
+  <section class="section" id="spec">
+    <span class="section-num">컴포넌트 명세</span>
+    <h2 class="section-title">UI 컴포넌트 ID / 기능 / API 연동</h2>
+    <p class="section-desc">우선순위: <span class="badge badge-must">Must</span> 필수 구현 &nbsp; <span class="badge badge-should">Should</span> 권장 &nbsp; <span class="badge badge-nice">Nice</span> 선택</p>
+
+    <table class="spec-table">
+      <thead>
+        <tr>
+          <th style="width:72px">ID</th>
+          <th style="width:130px">컴포넌트</th>
+          <th>기능 설명</th>
+          <th style="width:160px">API 연동</th>
+          <th style="width:72px">우선순위</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>UI-01</td>
+          <td>네비게이션 바</td>
+          <td>로고(좌) + 크롤링 버튼(우). <code>position: sticky; top:0</code>. 스크롤 후에도 항상 표시.</td>
+          <td><code>POST /api/crawl</code></td>
+          <td><span class="badge badge-must">Must</span></td>
+        </tr>
+        <tr>
+          <td>UI-02</td>
+          <td>히어로 영역</td>
+          <td>서비스 타이틀 · 부제 표시. 크롤링 완료 시 마지막 수집 시각 갱신 권장.</td>
+          <td>—</td>
+          <td><span class="badge badge-should">Should</span></td>
+        </tr>
+        <tr>
+          <td>UI-03</td>
+          <td>섹션 탭</td>
+          <td>순위 / 키워드 / 비교 3개 탭 전환. 활성 탭: 보라 언더라인(#534AB7) + 폰트 볼드.</td>
+          <td>—</td>
+          <td><span class="badge badge-must">Must</span></td>
+        </tr>
+        <tr>
+          <td>UI-04</td>
+          <td>베스트셀러 카드</td>
+          <td>표지 이미지 + 순위 뱃지 + 제목 + 저자 표시. 분야·서점 필터 조합으로 카드 갱신. 이미지 오류 시 회색 플레이스홀더.</td>
+          <td><code>GET /api/books</code></td>
+          <td><span class="badge badge-must">Must</span></td>
+        </tr>
+        <tr>
+          <td>UI-05</td>
+          <td>키워드 분야 선택</td>
+          <td><code>&lt;select&gt;</code> 드롭다운. 변경 시 Chart.js 차트 즉시 갱신. 기본값: 첫 번째 분야.</td>
+          <td><code>GET /api/trends</code></td>
+          <td><span class="badge badge-must">Must</span></td>
+        </tr>
+        <tr>
+          <td>UI-06</td>
+          <td>키워드 막대 차트</td>
+          <td>Chart.js 수평 막대 차트. 분야별 Top 10 키워드 빈도. 빈도 수치 막대 끝 레이블 표시.</td>
+          <td><code>GET /api/trends</code></td>
+          <td><span class="badge badge-must">Must</span></td>
+        </tr>
+        <tr>
+          <td>UI-07</td>
+          <td>서점별 비교 패널</td>
+          <td>분야별 알라딘/Yes24 좌우 2열 배치. 9개 분야 스크롤 표시. 공통 도서 초록 하이라이트.</td>
+          <td><code>GET /api/compare</code></td>
+          <td><span class="badge badge-must">Must</span></td>
+        </tr>
+        <tr>
+          <td>UI-08</td>
+          <td>크롤링 토스트</td>
+          <td>시작·진행·완료·오류 4가지 상태 메시지. 완료/오류 토스트 3초 후 자동 소멸.</td>
+          <td><code>GET /api/crawl/status</code></td>
+          <td><span class="badge badge-must">Must</span></td>
+        </tr>
+        <tr>
+          <td>UI-09</td>
+          <td>공통 도서 배지</td>
+          <td>두 서점 동시 등장 도서에 초록 "공통" 배지 + 초록 배경(#EAF3DE). 베스트셀러 카드 · 비교 패널 양쪽에 표시.</td>
+          <td><code>GET /api/compare</code></td>
+          <td><span class="badge badge-must">Must</span></td>
+        </tr>
+        <tr>
+          <td>UI-10</td>
+          <td>빈 상태 처리</td>
+          <td>DB 데이터 없을 시 "🔄 지금 크롤링 버튼을 눌러 데이터를 수집해 주세요" 안내 표시.</td>
+          <td>—</td>
+          <td><span class="badge badge-should">Should</span></td>
+        </tr>
+        <tr>
+          <td>UI-11</td>
+          <td>반응형 레이아웃</td>
+          <td>화면 폭 768px 이하: 책 카드 1열, 비교 패널 1열로 전환.</td>
+          <td>—</td>
+          <td><span class="badge badge-nice">Nice</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ====================================================
+       디자인 가이드
+  ==================================================== -->
+  <section class="section" id="design">
+    <span class="section-num">디자인 가이드</span>
+    <h2 class="section-title">색상 · 타이포그래피 · 레이아웃</h2>
+    <p class="section-desc">일관된 UI를 위한 최소 디자인 토큰 정의.</p>
+
+    <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;color:var(--text-2)">주요 색상</h3>
+    <div class="palette" style="margin-bottom:32px">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#534AB7"></div>
+        <div class="swatch-label">Primary<br>#534AB7</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#AFA9EC"></div>
+        <div class="swatch-label">Primary Lt<br>#AFA9EC</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#EEEDFE"></div>
+        <div class="swatch-label">Primary Bg<br>#EEEDFE</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#1D9E75"></div>
+        <div class="swatch-label">Success<br>#1D9E75</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#EAF3DE"></div>
+        <div class="swatch-label">Success Bg<br>#EAF3DE</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#D85A30"></div>
+        <div class="swatch-label">Danger<br>#D85A30</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#1a1a2e"></div>
+        <div class="swatch-label">Nav BG<br>#1a1a2e</div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#f7f6fb"></div>
+        <div class="swatch-label">Page BG<br>#f7f6fb</div>
+      </div>
+    </div>
+
+    <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;color:var(--text-2)">타이포그래피</h3>
+    <table class="spec-table" style="margin-bottom:32px">
+      <thead>
+        <tr><th>역할</th><th>크기</th><th>두께</th><th>색상</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>서비스 타이틀</td><td>18px</td><td>700</td><td>#ffffff (히어로 내)</td></tr>
+        <tr><td>섹션 제목</td><td>16px</td><td>600</td><td>#1a1a1a</td></tr>
+        <tr><td>책 제목</td><td>11~12px</td><td>600</td><td>#1a1a1a</td></tr>
+        <tr><td>저자·출판사</td><td>10~11px</td><td>400</td><td>#888</td></tr>
+        <tr><td>순위 번호</td><td>10px</td><td>400</td><td>#888</td></tr>
+        <tr><td>배지 텍스트</td><td>9~10px</td><td>700</td><td>역할별 색상</td></tr>
+        <tr><td>본문·설명</td><td>13~14px</td><td>400</td><td>#555</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:15px;font-weight:600;margin-bottom:14px;color:var(--text-2)">인터랙션 흐름 요약</h3>
+    <div class="flow-diagram">
+      <span class="flow-node primary">페이지 로드</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node">API 3개 병렬 요청</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node success">대시보드 렌더링</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node">크롤링 버튼 클릭</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node primary">백그라운드 실행</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node">2초 폴링</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node success">자동 갱신</span>
+    </div>
+  </section>
+
+</main>
+
+<footer class="doc-footer">
+  BookTrend 화면설계서 v1.0 &nbsp;·&nbsp; 2026-06-29 &nbsp;·&nbsp; SeSac AX 자동화 미니프로젝트
+</footer>
+
+</body>
+</html>
